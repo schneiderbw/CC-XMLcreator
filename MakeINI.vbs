@@ -51,6 +51,11 @@ Do Until objFile.AtEndOfStream
     'Set destFolder = createdFolder + "\"
     objFSO.CopyFile ccXLMexe, createdFolderPath + "\", True
 	objFSO.CopyFile ccZIPdll, createdFolderPath + "\",True
+	
+	'Create the scheduled task XML file
+	ccXMLexePath = createdFolderPath + "\PWC-NaturalFormsXML.exe"
+	Call genSchedXML(ccXMLexePath)
+	objFSO.CopyFile createdFolderPath + "\cc-scheduledtask.xml", ccRootFolder + "\schedulerXML\" + createdFolder + ".xml"
 Loop
 
 ' Clean up the folder created by the header of the CSV file
@@ -61,3 +66,61 @@ If objFSO.FolderExists(headerFolderPath) Then
 End If
 
 objFile.Close
+
+' This subroutine will create the scheduled task XML file
+Sub genSchedXML(exePath)
+	schedXML = createdFolderPath + "\cc-scheduledtask.xml"
+	Set objXMLfile = objFSO.CreateTextFile(schedXML,True)
+	objXMLfile.Write "<?xml version=""1.0"" encoding=""UTF-16""?>" & vbCrLf
+	objXMLfile.Write "<Task version=""1.2"" xmlns=""http://schemas.microsoft.com/windows/2004/02/mit/task"">" & vbCrLf
+	objXMLfile.Write "  <RegistrationInfo>" & vbCrLf
+	objXMLfile.Write "    <Date>2015-03-10T16:00:09.0480063</Date>" & vbCrLf
+	objXMLfile.Write "    <Author>PWC\bschneider</Author>" & vbCrLf
+	objXMLfile.Write "  </RegistrationInfo>" & vbCrLf
+	objXMLfile.Write "  <Triggers>" & vbCrLf
+	objXMLfile.Write "    <CalendarTrigger>" & vbCrLf
+	objXMLfile.Write "      <Repetition>" & vbCrLf
+	objXMLfile.Write "        <Interval>PT5M</Interval>" & vbCrLf
+	objXMLfile.Write "        <StopAtDurationEnd>false</StopAtDurationEnd>" & vbCrLf
+	objXMLfile.Write "      </Repetition>" & vbCrLf
+	objXMLfile.Write "      <StartBoundary>2015-03-10T15:59:32.8707236</StartBoundary>" & vbCrLf
+	objXMLfile.Write "      <Enabled>true</Enabled>" & vbCrLf
+	objXMLfile.Write "      <ScheduleByDay>" & vbCrLf
+	objXMLfile.Write "        <DaysInterval>1</DaysInterval>" & vbCrLf
+	objXMLfile.Write "      </ScheduleByDay>" & vbCrLf
+	objXMLfile.Write "    </CalendarTrigger>" & vbCrLf
+	objXMLfile.Write "  </Triggers>" & vbCrLf
+	objXMLfile.Write "  <Principals>" & vbCrLf
+	objXMLfile.Write "    <Principal id=""Author"">" & vbCrLf
+	objXMLfile.Write "      <UserId>PWC\m0m</UserId>" & vbCrLf
+	objXMLfile.Write "      <LogonType>Password</LogonType>" & vbCrLf
+	objXMLfile.Write "      <RunLevel>HighestAvailable</RunLevel>" & vbCrLf
+	objXMLfile.Write "    </Principal>" & vbCrLf
+	objXMLfile.Write "  </Principals>" & vbCrLf
+	objXMLfile.Write "  <Settings>" & vbCrLf
+	objXMLfile.Write "    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>" & vbCrLf
+	objXMLfile.Write "    <DisallowStartIfOnBatteries>true</DisallowStartIfOnBatteries>" & vbCrLf
+	objXMLfile.Write "    <DisallowStartIfOnBatteries>true</DisallowStartIfOnBatteries>" & vbCrLf
+	objXMLfile.Write "    <AllowHardTerminate>true</AllowHardTerminate>" & vbCrLf
+	objXMLfile.Write "    <StartWhenAvailable>true</StartWhenAvailable>" & vbCrLf
+	objXMLfile.Write "    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>" & vbCrLf
+	objXMLfile.Write "    <IdleSettings>" & vbCrLf
+	objXMLfile.Write "      <StopOnIdleEnd>true</StopOnIdleEnd>" & vbCrLf
+	objXMLfile.Write "      <RestartOnIdle>false</RestartOnIdle>" & vbCrLf
+	objXMLfile.Write "    </IdleSettings>" & vbCrLf
+	objXMLfile.Write "    <AllowStartOnDemand>true</AllowStartOnDemand>" & vbCrLf
+	objXMLfile.Write "    <Enabled>true</Enabled>" & vbCrLf
+	objXMLfile.Write "    <Hidden>false</Hidden>" & vbCrLf
+	objXMLfile.Write "    <RunOnlyIfIdle>false</RunOnlyIfIdle>" & vbCrLf
+	objXMLfile.Write "    <WakeToRun>false</WakeToRun>" & vbCrLf
+	objXMLfile.Write "    <ExecutionTimeLimit>P3D</ExecutionTimeLimit>" & vbCrLf
+	objXMLfile.Write "    <Priority>7</Priority>" & vbCrLf
+	objXMLfile.Write "  </Settings>" & vbCrLf
+	objXMLfile.Write "  <Actions Context=""Author"">" & vbCrLf
+	objXMLfile.Write "    <Exec>" & vbCrLf
+	objXMLfile.Write "      <Command>" + chr(34) + exePath + chr(34) + "</Command>"& vbCrLf
+	objXMLfile.Write "    </Exec>" & vbCrLf
+	objXMLfile.Write "  </Actions>" & vbCrLf
+	objXMLfile.Write "</Task>" & vbCrLf
+	
+End Sub
